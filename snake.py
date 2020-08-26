@@ -20,7 +20,7 @@ K_UP = pygame.K_UP
 K_DOWN = pygame.K_DOWN
 KMOD_LCTRL = pygame.KMOD_LCTRL
 K_w = pygame.K_w
-# pygame.key.set_repeat(100)
+pygame.key.set_repeat(100) # (delay, interval)
 
 snake_unit_size = 10
 snake_direction = K_RIGHT
@@ -50,24 +50,28 @@ while 1:
     if keys[K_LEFT] and snake_direction != K_RIGHT:
         snake_direction = K_LEFT
         snake_head[0] -= snake_unit_size
-        snake.appendleft(tuple(snake_head))
-        snake.pop()
     elif keys[K_RIGHT] and snake_direction != K_LEFT:
         snake_direction = K_RIGHT
         snake_head[0] += snake_unit_size
-        snake.appendleft(tuple(snake_head))
-        snake.pop()
     elif keys[K_UP] and snake_direction != K_DOWN:
         snake_direction = K_UP
         snake_head[1] -= snake_unit_size
-        snake.appendleft(tuple(snake_head))
-        snake.pop()
     elif keys[K_DOWN] and snake_direction != K_UP:
         snake_direction = K_DOWN
         snake_head[1] += snake_unit_size
-        snake.appendleft(tuple(snake_head))
-        snake.pop()
-    # else: no keys pressed, move one step in dir
+    else: 
+        # no keys pressed, move one step in dir
+        if snake_direction == K_LEFT:
+            snake_head[0] -= snake_unit_size
+        elif snake_direction == K_RIGHT:
+            snake_head[0] += snake_unit_size
+        elif snake_direction == K_UP:
+            snake_head[1] -= snake_unit_size
+        elif snake_direction == K_DOWN:
+            snake_head[1] += snake_unit_size 
+    snake.appendleft(tuple(snake_head))
+    snake.pop()
+
 
     screen.fill(white)
 
@@ -76,4 +80,5 @@ while 1:
         pygame.draw.rect(screen, blue, snake_unit_rect)
 
     pygame.display.flip() #or update
-    pygame.time.delay(25)
+    pygame.time.delay(30)
+
