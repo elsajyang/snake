@@ -20,6 +20,7 @@ we all like to start with the snake game
     - Snake head: blue square
     - Apple/food: red circle
     - "Press arrow key in any direction to start": poll for an arrow key
+- Upon losing, display "game over. try again?"
 
 ## Game State + Transitions
 - Poll for arrow keystrokes

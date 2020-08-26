@@ -39,46 +39,59 @@ while 1:
             sys.exit()
         if event.type == KEYDOWN or event.type == KEYUP:
             if event.mod == pygame.KMOD_NONE:
-                print("No modifier keys were in a pressed" 
+                print("No modifier keys were in a pressed " 
                     "state when this event occurred.")
             else:
                 if event.mod & KMOD_LCTRL and event.key == K_w:
                     pygame.quit()
                     sys.exit()
+    
+    if snake_head[0] < 0 or snake_head[0] > width       \
+        or snake_head[1] < 0 or snake_head[1] > height:
+        print("Snake out of bounds")
+        pygame.time.delay(500)
+        screen.fill(white)
+        font = pygame.font.SysFont(None, size=40)
+        endgame_screen = font.render("game over. try again?",
+                                    True, black)
+        screen.blit(endgame_screen, (width/4, height/2))
+        pygame.display.flip()
+        pygame.time.delay(1000)
 
-    keys = pygame.key.get_pressed()
-    if keys[K_LEFT] and snake_direction != K_RIGHT:
-        snake_direction = K_LEFT
-        snake_head[0] -= snake_unit_size
-    elif keys[K_RIGHT] and snake_direction != K_LEFT:
-        snake_direction = K_RIGHT
-        snake_head[0] += snake_unit_size
-    elif keys[K_UP] and snake_direction != K_DOWN:
-        snake_direction = K_UP
-        snake_head[1] -= snake_unit_size
-    elif keys[K_DOWN] and snake_direction != K_UP:
-        snake_direction = K_DOWN
-        snake_head[1] += snake_unit_size
-    else: 
-        # no keys pressed, move one step in dir
-        if snake_direction == K_LEFT:
+    else:
+        keys = pygame.key.get_pressed()
+        if keys[K_LEFT] and snake_direction != K_RIGHT:
+            snake_direction = K_LEFT
             snake_head[0] -= snake_unit_size
-        elif snake_direction == K_RIGHT:
+        elif keys[K_RIGHT] and snake_direction != K_LEFT:
+            snake_direction = K_RIGHT
             snake_head[0] += snake_unit_size
-        elif snake_direction == K_UP:
+        elif keys[K_UP] and snake_direction != K_DOWN:
+            snake_direction = K_UP
             snake_head[1] -= snake_unit_size
-        elif snake_direction == K_DOWN:
-            snake_head[1] += snake_unit_size 
-    snake.appendleft(tuple(snake_head))
-    snake.pop()
+        elif keys[K_DOWN] and snake_direction != K_UP:
+            snake_direction = K_DOWN
+            snake_head[1] += snake_unit_size
+        else: 
+            # no keys pressed, move one step in dir
+            if snake_direction == K_LEFT:
+                snake_head[0] -= snake_unit_size
+            elif snake_direction == K_RIGHT:
+                snake_head[0] += snake_unit_size
+            elif snake_direction == K_UP:
+                snake_head[1] -= snake_unit_size
+            elif snake_direction == K_DOWN:
+                snake_head[1] += snake_unit_size 
+        snake.appendleft(tuple(snake_head))
+        snake.pop()
 
 
-    screen.fill(white)
+        screen.fill(white)
 
-    for unit in snake:
-        snake_unit_rect = pygame.Rect(unit, (snake_unit_size, snake_unit_size))
-        pygame.draw.rect(screen, blue, snake_unit_rect)
+        for unit in snake:
+            snake_unit_rect = pygame.Rect(unit, (snake_unit_size, snake_unit_size))
+            pygame.draw.rect(screen, blue, snake_unit_rect)
 
-    pygame.display.flip() #or update
-    pygame.time.delay(30)
+        pygame.display.flip() #or update
+        pygame.time.delay(30)
 
