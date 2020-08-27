@@ -22,7 +22,7 @@ we all like to start with the snake game
     - "Press arrow key in any direction to start": poll for an arrow key
 - Upon losing, display "game over. try again?"
 
-## Game State + Transitions
+## Game State + Transitions (v1)
 - Poll for arrow keystrokes
 - Move one step in direction, render
 - Upon reading a valid arrow keystroke:
@@ -39,6 +39,18 @@ we all like to start with the snake game
     Freeze for a few sec
     End game
     Render "End game"
+
+
+## Game State + Transitions (v2)
+Options
+- key input (or auto advance) -> update snake_head position and snake_direction -> render -> next while loop -> check if snake has hit a wall or itself
+- key input (or auto advance) -> update snake -> check if snake has hit wall or itself -> if not, render and continue
+
+
+## State vs Actual Rendered State
+- variables to help calculate state: snake_head, snake_direction
+- part to rendered: snake (list of coordinates)
+
 
 
 ### Board
