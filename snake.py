@@ -37,8 +37,8 @@ pygame.key.set_repeat(100) # (delay, interval)
 # Snake
 snake_unit_size = 18
 snake_direction = K_RIGHT
-snake_head = [(width/4) // snake_unit_size * snake_unit_size, (height/2) // snake_unit_size * snake_unit_size]     # multiple of snake_unit_size
-snake = collections.deque([(snake_head[0] - (i * snake_unit_size), snake_head[1]) 
+snake_head = pygame.Rect(((width/4) // snake_unit_size * snake_unit_size, (height/2) // snake_unit_size * snake_unit_size), (snake_unit_size, snake_unit_size))     # multiple of snake_unit_size
+snake = collections.deque([pygame.Rect((snake_head.x - (i * snake_unit_size), snake_head.y), (snake_unit_size, snake_unit_size)) 
                             for i in range(10)])
 
 # Food
@@ -59,8 +59,7 @@ food_center = generateFoodPos(width, height, food_unit_rad)
 
 
 # Initial rendering
-for unit in snake:
-    snake_unit_rect = pygame.Rect(unit, (snake_unit_size, snake_unit_size))
+for snake_unit_rect in snake:
     pygame.draw.rect(screen, blue, snake_unit_rect)
 food_rect = pygame.draw.circle(screen, red, food_center, food_unit_rad)
 score_bar = pygame.Surface((score_bar_size))
@@ -85,43 +84,47 @@ while 1:
     keys = pygame.key.get_pressed()
     if keys[K_LEFT] and snake_direction != K_RIGHT:
         snake_direction = K_LEFT
-        snake_head[0] -= snake_unit_size
+        snake_head.x -= snake_unit_size
     elif keys[K_RIGHT] and snake_direction != K_LEFT:
         snake_direction = K_RIGHT
-        snake_head[0] += snake_unit_size
+        snake_head.x += snake_unit_size
     elif keys[K_UP] and snake_direction != K_DOWN:
         snake_direction = K_UP
-        snake_head[1] -= snake_unit_size
+        snake_head.y -= snake_unit_size
     elif keys[K_DOWN] and snake_direction != K_UP:
         snake_direction = K_DOWN
-        snake_head[1] += snake_unit_size
+        snake_head.y += snake_unit_size
     else: 
         # No user input. Advance one step in dir
         if snake_direction == K_LEFT:
-            snake_head[0] -= snake_unit_size
+            snake_head.x -= snake_unit_size
         elif snake_direction == K_RIGHT:
-            snake_head[0] += snake_unit_size
+            snake_head.x += snake_unit_size
         elif snake_direction == K_UP:
-            snake_head[1] -= snake_unit_size
+            snake_head.y -= snake_unit_size
         elif snake_direction == K_DOWN:
-            snake_head[1] += snake_unit_size
+            snake_head.y += snake_unit_size
         
     # Wall collision
-    if snake_head[0] < 0 or snake_head[0] >= width       \
-    or snake_head[1] < 0 or snake_head[1] >= height:
+    if snake_head.x < 0 or snake_head.x >= width       \
+    or snake_head.y < 0 or snake_head.y >= height:
         print("Snake out of bounds")
         break;
     
     # Self collision
-    if tuple(snake_head) in snake:
+    if snake_head.collidelist(snake) != -1:
         print("Snake hit itself")
         break;
     
     # Food collision
-    snake_head_rect = pygame.Rect(snake_head, (snake_unit_size, snake_unit_size))
-    if snake_head_rect.colliderect(food_rect):
+    if snake_head.colliderect(food_rect):
         score += 1
         food_center = generateFoodPos(width, height, food_unit_rad)
+        food_rect = pygame.draw.circle(screen, red, food_center, food_unit_rad)
+        while food_rect.collidelist(snake) != -1:
+            print("Regenerate food position")
+            food_center = generateFoodPos(width, height, food_unit_rad)
+            food_rect = pygame.draw.circle(screen, red, food_center, food_unit_rad)
         snake.appendleft(tuple(snake_head))
     else:
         snake.appendleft(tuple(snake_head))
@@ -130,8 +133,7 @@ while 1:
     # Render new states
     screen.fill(white)
 
-    for unit in snake:
-        snake_unit_rect = pygame.Rect(unit, (snake_unit_size, snake_unit_size))
+    for snake_unit_rect in snake:
         pygame.draw.rect(screen, blue, snake_unit_rect)
     food_rect = pygame.draw.circle(screen, red, food_center, food_unit_rad)
     score_bar.fill(grey)
