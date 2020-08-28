@@ -8,11 +8,17 @@ pygame.init()
 
 # Board
 board_size = width, height = 500, 300
-screen = pygame.display.set_mode(board_size, flags=pygame.RESIZABLE)      # returns a new Surface object
+score_bar_size = width, 30
+
+# Screen
+screen_size = board_size[0], board_size[1] + score_bar_size[1]
+screen = pygame.display.set_mode(screen_size, flags=pygame.RESIZABLE)      # returns a new Surface object
+
 
 # Colors
 white = 255, 255, 255
 black = 0, 0, 0
+grey = 100, 100, 100
 red = 255, 0, 0     # reflect red
 blue = 0, 0, 255
 
@@ -29,7 +35,7 @@ K_w = pygame.K_w
 pygame.key.set_repeat(100) # (delay, interval)
 
 # Snake
-snake_unit_size = 10
+snake_unit_size = 18
 snake_direction = K_RIGHT
 snake_head = [(width/4) // snake_unit_size * snake_unit_size, (height/2) // snake_unit_size * snake_unit_size]     # multiple of snake_unit_size
 snake = collections.deque([(snake_head[0] - (i * snake_unit_size), snake_head[1]) 
@@ -47,7 +53,7 @@ def generateFoodPos(width, height, food_unit_rad):
     return (random.randrange(food_unit_rad, width-food_unit_rad+1, 2*food_unit_rad), 
                 random.randrange(food_unit_rad, height-food_unit_rad+1, 2*food_unit_rad))
 
-food_unit_rad = 5
+food_unit_rad = snake_unit_size // 2
 food_center = generateFoodPos(width, height, food_unit_rad)
 
 
@@ -57,6 +63,10 @@ for unit in snake:
     snake_unit_rect = pygame.Rect(unit, (snake_unit_size, snake_unit_size))
     pygame.draw.rect(screen, blue, snake_unit_rect)
 food_rect = pygame.draw.circle(screen, red, food_center, food_unit_rad)
+score_bar = pygame.Surface((score_bar_size))
+score_bar.fill(grey)
+screen.blit(score_bar, (0, height))
+score = 0
 
 while 1:
     for event in pygame.event.get():
@@ -110,6 +120,7 @@ while 1:
     # Food collision
     snake_head_rect = pygame.Rect(snake_head, (snake_unit_size, snake_unit_size))
     if snake_head_rect.colliderect(food_rect):
+        score += 1
         food_center = generateFoodPos(width, height, food_unit_rad)
         snake.appendleft(tuple(snake_head))
     else:
@@ -123,12 +134,17 @@ while 1:
         snake_unit_rect = pygame.Rect(unit, (snake_unit_size, snake_unit_size))
         pygame.draw.rect(screen, blue, snake_unit_rect)
     food_rect = pygame.draw.circle(screen, red, food_center, food_unit_rad)
+    score_bar.fill(grey)
+    font = pygame.font.SysFont(None, size=30)
+    score_text = font.render("score: " + str(score), True, white)
+    screen.blit(score_bar, (0, height))
+    screen.blit(score_text, (width - round(1.5*score_text.get_width(),0), height + ((score_bar.get_height() - score_text.get_height()) // 2)))
 
     pygame.display.flip() #or update
     pygame.time.delay(50)
 
 
-# Freeze the state of snake on game over
+# On game over, freeze the state of snake
 pygame.time.delay(500)
 screen.fill(white)
 
